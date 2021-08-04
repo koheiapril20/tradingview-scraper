@@ -5,6 +5,10 @@ export class TradingViewAPI {
   private subscriptionMap: Map<string, Set<TickerSubscription>> = new Map();
   private ws: TVWebSocket = new TVWebSocket();
 
+  public setAuthToken(token: string) {
+      this.ws.setAuthToken(token);
+  }
+
   public async setup() {
     this.ws.on("data", (simpleOrProName: string, status: string, data: any) => {
       if (status !== "ok") {

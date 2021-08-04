@@ -54,7 +54,7 @@ export class TVWebSocket extends EventEmitter {
   ];
   private static DEFAULT_TIMEOUT = 3000;
 
-  private static UNAUTHORIZED_USER_TOKEN = "unauthorized_user_token";
+  private userToken = "unauthorized_user_token";
   private static generateSession() {
     return "qs_" + randomstring.generate({ length: 12, charset: "alphabetic" });
   }
@@ -97,6 +97,10 @@ export class TVWebSocket extends EventEmitter {
     this.removeQuoteSymbol(symbol);
   }
 
+  public setAuthToken(token: string) {
+      this.userToken = token;
+  }
+
   private onPacket(packet: ISIOPacket) {
     if (packet.isKeepAlive) {
       // Handle protocol keepalive packets
@@ -106,7 +110,7 @@ export class TVWebSocket extends EventEmitter {
     const data = packet.data;
     // Handle session packet
     if (data.session_id) {
-      this.setAuthToken(TVWebSocket.UNAUTHORIZED_USER_TOKEN);
+      this.sendAuthToken(this.userToken);
       this.createQuoteSession();
       this.setQuoteFields(TVWebSocket.ALL_QUOTE_FIELDS);
       return;
@@ -123,7 +127,7 @@ export class TVWebSocket extends EventEmitter {
     }
   }
 
-  private setAuthToken(token: string) {
+  private sendAuthToken(token: string) {
     this.wsSend("set_auth_token", [token]);
   }
 
